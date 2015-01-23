@@ -13,12 +13,14 @@ class Grid
 public:
 	Grid(int w, int h);
 	~Grid();
-	Cell *getCell(int x, int y) const;
-	Row getRow(const int r) const;
-	Column getColumn(const int c) const;
+	Cell& getCell(int x, int y);
+	Row& getRow(const int r);
+	Column& getColumn(const int c);
+	int getWidth() const;
+	int getHeight() const;
 protected:
 	int width, height;
-	std::vector<Cell *> cells;
+	std::vector<Cell> cells;
 };
 
 

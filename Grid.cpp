@@ -8,10 +8,10 @@
 Grid::Grid(int w, int h) : width(w),
 			   height(h)
 {
-	cells.resize(w*h);
+	cells.reserve(w*h);
 	for(int r=0; r<h; ++r){
 		for(int c=0; c<w; ++c){
-			cells.push_back(new Cell(c, r));
+			cells.push_back(Cell(c, r));
 		}
 	}
 
@@ -20,14 +20,14 @@ Grid::Grid(int w, int h) : width(w),
 
 Grid::~Grid()
 {
-	for(auto& c: cells)
-		delete c;
+//	for(auto& c: cells)
+//		delete c;
 
 	cells.clear();
 }
 
 
-Cell *Grid::getCell(int x, int y) const
+Cell& Grid::getCell(int x, int y)
 {
 	if(x < 0 || x >= width || y < 0 || y >= height){
 		std::ostringstream ess;
@@ -40,7 +40,7 @@ Cell *Grid::getCell(int x, int y) const
 }
 
 
-Row Grid::getRow(const int r) const
+Row& Grid::getRow(const int r)
 {
 	if(r < 0 || r >= height){
 		std::ostringstream ess;
@@ -50,13 +50,13 @@ Row Grid::getRow(const int r) const
 	}
 
 	Row *row = new Row();
-	row->resize(width);
+	row->reserve(width);
 
-	std::cout << "getRow() from " << r*width
-		  << " to " << (r+1)*width << std::endl;
+//	std::cout << "getRow() from " << r*width
+//		  << " to " << (r+1)*width << std::endl;
 	for(int i=r*width; i<(r+1)*width; ++i){
 		std::cout << i << " ";
-		row->push_back(cells[i]);
+		row->push_back(&cells[i]);
 	}
 	std::cout << std::endl;
 
@@ -64,7 +64,7 @@ Row Grid::getRow(const int r) const
 }
 
 
-Column Grid::getColumn(const int c) const
+Column& Grid::getColumn(const int c)
 {
 	if(c < 0 || c >= height){
 		std::ostringstream ess;
@@ -74,13 +74,25 @@ Column Grid::getColumn(const int c) const
 	}
 
 	Column *col = new Column();
-	col->resize(height);
+	col->reserve(height);
 
 	for(int i=c; i<width*height; i+=width){
-		std::cout << i << " ";
-		col->push_back(cells[i]);
+//		std::cout << i << " (" << &cells[i] << ") ";
+		col->push_back(&cells[i]);
 	}
 	std::cout << std::endl;
 
 	return *col;
+}
+
+
+int Grid::getWidth() const
+{
+	return width;
+}
+
+
+int Grid::getHeight() const
+{
+	return height;
 }

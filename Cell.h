@@ -23,6 +23,7 @@ public:
 	void setState(State s);
 	void showState() const;
 	static std::map<State, const std::string> stateMap;
+	friend std::ostream& operator<<(std::ostream& ostr, Cell& c);
 protected:
 	int x, y;
 	State state;

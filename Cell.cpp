@@ -1,7 +1,6 @@
 #include "Cell.h"
 #include <iostream>
 #include <type_traits>
-#include <map>
 
 
 std::map<State, const std::string> Cell::stateMap = {	{State::Undef, "Undefined"},
@@ -49,4 +48,13 @@ void Cell::showState() const
 {
 //	std::cout << static_cast<std::underlying_type<State>::type>(state) << std::endl;
 	std::cout << Cell::stateMap[state] << std::endl;
+}
+
+
+std::ostream& operator<<(std::ostream& ostr, Cell& c)
+{
+	ostr << "[" << c.x << "," << c.y << "] "
+	     << Cell::stateMap[c.state] << std::endl;
+
+	return ostr;
 }
