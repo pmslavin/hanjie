@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <algorithm>
 
 
 Grid::Grid(int w, int h) : width(w),
@@ -15,6 +16,23 @@ Grid::Grid(int w, int h) : width(w),
 		}
 	}
 
+}
+
+
+Grid::Grid(std::vector<std::string> pattern)
+{
+	width = pattern[0].size();
+	height = pattern.size();
+
+	cells.reserve(width*height);
+
+	State s;
+	for(int r=0; r<height; ++r){
+		for(int c=0; c<width; ++c){
+			s = (pattern[r][c] == '1') ? State::Filled : State::Clear;
+			cells.push_back(Cell(c, r, s));
+		}
+	}
 }
 
 
@@ -55,10 +73,10 @@ Row& Grid::getRow(const int r)
 //	std::cout << "getRow() from " << r*width
 //		  << " to " << (r+1)*width << std::endl;
 	for(int i=r*width; i<(r+1)*width; ++i){
-		std::cout << i << " ";
+//		std::cout << i << " ";
 		row->push_back(&cells[i]);
 	}
-	std::cout << std::endl;
+//	std::cout << std::endl;
 
 	return *row;
 }
@@ -66,7 +84,7 @@ Row& Grid::getRow(const int r)
 
 Column& Grid::getColumn(const int c)
 {
-	if(c < 0 || c >= height){
+	if(c < 0 || c >= width){
 		std::ostringstream ess;
 		ess << "Invalid Column: getColumn(" << c
 		    << ")" << std::endl;
@@ -80,7 +98,7 @@ Column& Grid::getColumn(const int c)
 //		std::cout << i << " (" << &cells[i] << ") ";
 		col->push_back(&cells[i]);
 	}
-	std::cout << std::endl;
+//	std::cout << std::endl;
 
 	return *col;
 }
@@ -95,4 +113,38 @@ int Grid::getWidth() const
 int Grid::getHeight() const
 {
 	return height;
+}
+
+
+std::string Grid::writeRow(const int r)
+{
+	Row row = getRow(r);
+
+	std::ostringstream oss;
+
+	for(auto& e: row)
+		oss << ((e->getState() == State::Filled) ? '#' : ' ');
+	
+	return oss.str();
+}
+
+
+std::vector<int> Grid::encode(std::vector<Cell *> unit)
+{
+	std::vector<int> code;
+	int run=0;
+
+	for(auto it=unit.cbegin(); it != unit.cend(); ++it){
+		if((*it)->getState() == State::Filled){
+			++run;
+		}else if(run){
+			code.push_back(run);
+			run = 0;
+		}
+	}
+
+	if(run)
+		code.push_back(run);
+
+	return code;
 }
