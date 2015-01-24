@@ -2,7 +2,7 @@ CXX	:= g++
 CXXFLAGS:= -std=c++11 -g -O0
 WARN	:= -Wall -Wextra
 OBJECTS	:= Cell.o Grid.o Frame.o
-LIBS	:= -lSDL2
+LIBS	:= -lSDL2 -lSDL2_ttf
 
 all: main
 

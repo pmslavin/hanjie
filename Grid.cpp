@@ -58,7 +58,7 @@ Cell& Grid::getCell(int x, int y)
 }
 
 
-Row& Grid::getRow(const int r)
+Row Grid::getRow(const int r)
 {
 	if(r < 0 || r >= height){
 		std::ostringstream ess;
@@ -67,22 +67,22 @@ Row& Grid::getRow(const int r)
 		throw std::out_of_range(ess.str());
 	}
 
-	Row *row = new Row();
-	row->reserve(width);
+	Row row;
+	row.reserve(width);
 
 //	std::cout << "getRow() from " << r*width
 //		  << " to " << (r+1)*width << std::endl;
 	for(int i=r*width; i<(r+1)*width; ++i){
 //		std::cout << i << " ";
-		row->push_back(&cells[i]);
+		row.push_back(&cells[i]);
 	}
 //	std::cout << std::endl;
 
-	return *row;
+	return row;
 }
 
 
-Column& Grid::getColumn(const int c)
+Column Grid::getColumn(const int c)
 {
 	if(c < 0 || c >= width){
 		std::ostringstream ess;
@@ -91,16 +91,16 @@ Column& Grid::getColumn(const int c)
 		throw std::out_of_range(ess.str());
 	}
 
-	Column *col = new Column();
-	col->reserve(height);
+	Column col;
+	col.reserve(height);
 
 	for(int i=c; i<width*height; i+=width){
 //		std::cout << i << " (" << &cells[i] << ") ";
-		col->push_back(&cells[i]);
+		col.push_back(&cells[i]);
 	}
 //	std::cout << std::endl;
 
-	return *col;
+	return col;
 }
 
 
@@ -143,7 +143,7 @@ std::vector<int> Grid::encode(std::vector<Cell *> unit)
 		}
 	}
 
-	if(run)
+	if(run || code.empty())
 		code.push_back(run);
 
 	return code;

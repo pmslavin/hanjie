@@ -16,8 +16,8 @@ public:
 	Grid(std::vector<std::string> pattern);
 	~Grid();
 	Cell& getCell(int x, int y);
-	Row& getRow(const int r);
-	Column& getColumn(const int c);
+	Row getRow(const int r);
+	Column getColumn(const int c);
 	int getWidth() const;
 	int getHeight() const;
 	std::string writeRow(const int r);

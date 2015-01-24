@@ -39,6 +39,23 @@ whale = { 	"00111011000000000000",
 		"00000000000000000000"
 	};
 
+std::vector<std::string>
+cross = {	"0001000",
+		"0001000",
+		"0001000",
+		"1111111",
+		"0001000",
+		"0001000",
+		"0001000"
+	};
+
+std::vector<std::string>
+emma =	{	"0111110",
+		"0100000",
+		"0111110",
+		"0100000",
+		"0111110"
+	};
 
 
 int main()
@@ -60,8 +77,8 @@ int main()
 	for(auto& e: col)
 		std::cout << *e;
 */
-	Frame f(1024, 768);
 	Grid pg(puppy);
+	Frame f(1024, 768, &pg);
 
 	std::cout << pg.getWidth() << ","
 		  << pg.getHeight() << std::endl;
@@ -94,6 +111,7 @@ int main()
 
 		std::cout << std::endl;
 	}
+
 
 	return 0;
 }
