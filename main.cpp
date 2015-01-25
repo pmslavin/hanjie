@@ -1,6 +1,7 @@
 #include "Cell.h"
 #include "Grid.h"
 #include "Frame.h"
+#include "SDL2/SDL.h"
 
 
 std::vector<std::string>
@@ -77,6 +78,10 @@ int main()
 	for(auto& e: col)
 		std::cout << *e;
 */
+	bool active = true;
+	const int delay = 200;
+	SDL_Event event;
+
 	Grid pg(puppy);
 	Frame f(1024, 768, &pg);
 
@@ -110,6 +115,31 @@ int main()
 			std::cout << i << " ";
 
 		std::cout << std::endl;
+	}
+
+	int mx, my;
+	f.drawGrid();
+	f.updateGrid();
+	f.refresh();
+	while(active){
+		while(SDL_PollEvent(&event)){
+			switch(event.type){
+				case SDL_QUIT:	
+						active = false;
+						break;
+				case SDL_KEYDOWN:
+						if(event.key.keysym.sym == 'q')
+							active = false;
+						break;
+				case SDL_MOUSEBUTTONDOWN:
+						SDL_GetMouseState(&mx, &my);
+						f.clickAt(mx, my);
+						break;
+
+			}	
+		}
+		f.refresh();
+		SDL_Delay(delay);
 	}
 
 

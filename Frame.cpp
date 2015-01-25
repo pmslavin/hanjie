@@ -10,7 +10,6 @@ Frame::Frame(int w, int h, Grid *g) :	width(w), height(h),
 					cellsz(32),
 					grid(g)
 {
-
 	if(grid)
 		setGridGeometry();
 
@@ -21,11 +20,6 @@ Frame::Frame(int w, int h, Grid *g) :	width(w), height(h),
 
 	TTF_Init();
 	font = TTF_OpenFont("OpenSans-Regular.ttf", 12);
-
-	draw();
-	SDL_Delay(2000);
-	updateGrid();
-	SDL_Delay(10000);
 }
 
 
@@ -42,7 +36,7 @@ Frame::~Frame()
 }
 
 
-void Frame::draw()
+void Frame::drawGrid()
 {
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 
@@ -89,21 +83,22 @@ void Frame::draw()
 	for(c=0; c<=cols; c+=5)
 		SDL_RenderDrawLine(renderer, gridx_l+c*cellsz+1, gridy_t-code_t, gridx_l+c*cellsz+1, gridy_t+gridh);
 
-
-	SDL_RenderPresent(renderer);
 }
 
 
 void Frame::flipCell(int x, int y)
 {
-/*	Cell &c = grid->getCell(x, y);
+	Cell &c = grid->getCell(x, y);
 	State curState = c.getState();
 
-	if(curState == State::Clear)
+	if(curState == State::Clear){
 		c.setState(State::Filled);
-	else if(curState == State::Filled)
+		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+	}else if(curState == State::Filled){
 		c.setState(State::Clear);
-*/
+		SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	}
+
 	SDL_Rect czRect;
 
 	czRect.w	= cellsz;
@@ -112,7 +107,40 @@ void Frame::flipCell(int x, int y)
 	czRect.y	= gridy_t + y*cellsz;
 
 	SDL_RenderFillRect(renderer, &czRect);
-//	SDL_RenderPresent(renderer);
+}
+
+
+void Frame::setCell(int x, int y)
+{
+	Cell &c = grid->getCell(x, y);
+	c.setState(State::Filled);
+
+	SDL_Rect czRect;
+
+	czRect.w	= cellsz;
+	czRect.h	= cellsz;
+	czRect.x	= gridx_l + x*cellsz;
+	czRect.y	= gridy_t + y*cellsz;
+
+	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+	SDL_RenderFillRect(renderer, &czRect);
+}
+
+
+void Frame::clearCell(int x, int y)
+{
+	Cell &c = grid->getCell(x, y);
+	c.setState(State::Clear);
+
+	SDL_Rect czRect;
+
+	czRect.w	= cellsz;
+	czRect.h	= cellsz;
+	czRect.x	= gridx_l + x*cellsz;
+	czRect.y	= gridy_t + y*cellsz;
+
+	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_RenderFillRect(renderer, &czRect);
 }
 
 
@@ -136,7 +164,7 @@ void Frame::updateGrid()
 		Row row = grid->getRow(r);
 		for(auto &c: row){
 			if(c->getState() == State::Filled)
-				flipCell(cidx, r);
+				setCell(cidx, r);
 
 			++cidx;		/* "Cell index" */
 		}
@@ -187,6 +215,40 @@ void Frame::updateGrid()
 			SDL_DestroyTexture(codetex);
 		}
 	}
+}
 
+
+bool Frame::isXYinGrid(int mx, int my) const
+{
+	return (mx > gridx_l && mx < gridx_l+cols*cellsz) && (my > gridy_t && my < gridy_t+rows*cellsz);
+}
+
+
+Cell& Frame::xy2Cell(int mx, int my)
+{
+	int r, c;
+
+	r = (mx - gridx_l)/cellsz;
+	c = (my - gridy_t)/cellsz;
+
+	return grid->getCell(r, c);
+}
+
+
+void Frame::clickAt(int mx, int my)
+{
+	if(isXYinGrid(mx, my)){
+		Cell& c = xy2Cell(mx, my);
+		flipCell(c.getX(), c.getY());
+	}
+}
+
+
+void Frame::refresh()
+{
+	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_RenderClear(renderer);
+	drawGrid();
+	updateGrid();
 	SDL_RenderPresent(renderer);
 }

@@ -5,6 +5,7 @@
 #include "SDL2/SDL_ttf.h"
 
 class Grid;
+class Cell;
 enum class State;
 
 
@@ -13,10 +14,14 @@ class Frame
 public:
 	Frame(int w, int h, Grid *g=nullptr);
 	~Frame();
-	void draw();
+	void drawGrid();
 	void setGrid(Grid *g);
 	void updateGrid();
 	void setGridGeometry();
+	void setCell(int x, int y);
+	void clearCell(int x, int y);
+	void clickAt(int mx, int my);
+	void refresh();
 protected:
 	int width, height;
 	int rows, cols;
@@ -27,6 +32,8 @@ protected:
 	TTF_Font *font;
 	Grid *grid;
 	void flipCell(int x, int y);
+	Cell& xy2Cell(int mx, int my);
+	bool isXYinGrid(int mx, int my) const;
 };
 
 #endif
