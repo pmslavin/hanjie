@@ -7,12 +7,13 @@
 class Grid;
 class Cell;
 enum class State;
+class Preview;
 
 
 class Frame
 {
 public:
-	Frame(int w, int h, Grid *g=nullptr);
+	Frame(int w, int h, Grid *g=nullptr, bool prev=true);
 	~Frame();
 	void drawGrid();
 	void setGrid(Grid *g);
@@ -34,6 +35,8 @@ protected:
 	void flipCell(int x, int y);
 	Cell& xy2Cell(int mx, int my);
 	bool isXYinGrid(int mx, int my) const;
+	bool hasPreview;
+	Preview *preview;
 };
 
 #endif

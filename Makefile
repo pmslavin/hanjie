@@ -1,7 +1,7 @@
 CXX	:= g++
 CXXFLAGS:= -std=c++11 -g -O0
 WARN	:= -Wall -Wextra
-OBJECTS	:= Cell.o Grid.o Frame.o
+OBJECTS	:= Cell.o Grid.o Frame.o Preview.o
 LIBS	:= -lSDL2 -lSDL2_ttf
 
 all: main
@@ -17,6 +17,10 @@ Grid.o: Grid.cpp Grid.h
 
 Frame.o: Frame.cpp Frame.h
 	${CXX} ${CXXFLAGS} ${WARN} -c Frame.cpp
+
+
+Preview.o: Preview.cpp Preview.h
+	${CXX} ${CXXFLAGS} ${WARN} -c Preview.cpp
 
 clean:
 	-rm *.o main

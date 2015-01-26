@@ -1,14 +1,17 @@
 #include "Frame.h"
 #include "Grid.h"
 #include "Cell.h"
+#include "Preview.h"
 
 #include <sstream>
 
 
-Frame::Frame(int w, int h, Grid *g) :	width(w), height(h),
-					rows(15), cols(20),
-					cellsz(32),
-					grid(g)
+Frame::Frame(int w, int h, Grid *g, bool prev) :	width(w), height(h),
+							rows(15), cols(20),
+							cellsz(32),
+							grid(g),
+							hasPreview(prev),
+							preview(nullptr)
 {
 	if(grid)
 		setGridGeometry();
@@ -20,6 +23,8 @@ Frame::Frame(int w, int h, Grid *g) :	width(w), height(h),
 
 	TTF_Init();
 	font = TTF_OpenFont("OpenSans-Regular.ttf", 12);
+	if(hasPreview)
+		preview = new Preview(cols*cellsz/5, rows*cellsz/5, grid);
 }
 
 
@@ -32,7 +37,8 @@ void Frame::setGridGeometry()
 
 Frame::~Frame()
 {
-
+	if(preview)
+		delete preview;
 }
 
 
@@ -40,9 +46,9 @@ void Frame::drawGrid()
 {
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 
-	int header	= height/7;
+	int header	= height/6;
 //	int footer	= height/7;
-	int margin_l	= width/9;
+	int margin_l	= width/11;
 //	int margin_r	= width/9;
 	int code_l	= width/7;		/* Code space left */
 	int code_t	= height/7;		/* Code space top */
@@ -250,5 +256,12 @@ void Frame::refresh()
 	SDL_RenderClear(renderer);
 	drawGrid();
 	updateGrid();
+	if(hasPreview){
+		SDL_Surface *prevsurf = preview->draw();
+		SDL_Texture *prevtext = SDL_CreateTextureFromSurface(renderer, prevsurf);
+		SDL_Rect prevRect = { width-140, gridy_t-2*preview->getHeight(), preview->getWidth(), preview->getHeight() };
+		SDL_RenderCopy(renderer, prevtext, NULL, &prevRect);
+		SDL_DestroyTexture(prevtext);
+	}
 	SDL_RenderPresent(renderer);
 }

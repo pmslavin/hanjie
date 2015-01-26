@@ -12,7 +12,7 @@ Grid::Grid(int w, int h) : width(w),
 	cells.reserve(w*h);
 	for(int r=0; r<h; ++r){
 		for(int c=0; c<w; ++c){
-			cells.push_back(Cell(c, r));
+			cells.push_back(Cell(c, r, State::Clear));
 		}
 	}
 

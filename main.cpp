@@ -79,11 +79,12 @@ int main()
 		std::cout << *e;
 */
 	bool active = true;
-	const int delay = 200;
+	const int delay = 100;
 	SDL_Event event;
 
-	Grid pg(puppy);
-	Frame f(1024, 768, &pg);
+	Grid pg(cross);
+//	Grid pg(20, 15);
+	Frame f(1200, 900, &pg);
 
 	std::cout << pg.getWidth() << ","
 		  << pg.getHeight() << std::endl;

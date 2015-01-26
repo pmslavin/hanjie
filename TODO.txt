@@ -1,0 +1,5 @@
+[1]  Write Grid+Codes to BMP.
+[2]  Write Grid+Codes to PS.
+[3]  Write Grid+Codes to PSD (libgs/libHaru?).
+[4]  Preview widow when editing.			DONE
+[5]  Read in text file pattern.
