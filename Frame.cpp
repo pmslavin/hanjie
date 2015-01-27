@@ -336,3 +336,24 @@ void Frame::clearAllCells()
 			c->setState(State::Clear);
 	}
 }
+
+
+void Frame::toggleHide()
+{
+	hideCells = !hideCells;
+}
+
+
+void Frame::invertGrid()
+{
+	for(int r=0; r<grid->getHeight(); ++r){
+		Row row = grid->getRow(r);
+		for(auto& c: row){
+			State cState = c->getState();
+			if(cState == State::Filled)
+				c->setState(State::Clear);
+			else if(cState == State::Clear)
+				c->setState(State::Filled);
+		}
+	}
+}

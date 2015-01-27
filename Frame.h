@@ -25,6 +25,8 @@ public:
 	void writeBMP(const char *filename);
 	void mouseAction(SDL_Event *e);
 	void clearAllCells();
+	void toggleHide();
+	void invertGrid();
 protected:
 	int width, height;
 	int rows, cols;
