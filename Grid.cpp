@@ -38,9 +38,6 @@ Grid::Grid(std::vector<std::string> pattern)
 
 Grid::~Grid()
 {
-//	for(auto& c: cells)
-//		delete c;
-
 	cells.clear();
 }
 

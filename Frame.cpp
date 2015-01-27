@@ -9,7 +9,7 @@
 Frame::Frame(int w, int h, Grid *g, bool prev) :	width(w), height(h),
 							rows(15), cols(20),
 							code_l(width/7), code_t(height/7),
-							cellsz(32),
+							cellsz(28),
 							grid(g),
 							hasPreview(prev),
 							hideCells(false),
@@ -28,7 +28,7 @@ Frame::Frame(int w, int h, Grid *g, bool prev) :	width(w), height(h),
 	TTF_Init();
 	font = TTF_OpenFont("OpenSans-Regular.ttf", 12);
 	if(hasPreview)
-		preview = new Preview(cols*cellsz/5, rows*cellsz/5, grid);
+		preview = new Preview(cols*cellsz/4, rows*cellsz/4, grid);
 }
 
 
@@ -54,8 +54,6 @@ void Frame::drawGrid()
 //	int footer	= height/7;
 	int margin_l	= width/11;
 //	int margin_r	= width/9;
-//	int code_l	= width/7;		/* Code space left */
-//	int code_t	= height/7;		/* Code space top */
 
 	int gridw	= cellsz * cols;
 	int gridh	= cellsz * rows;
@@ -265,6 +263,16 @@ void Frame::refresh()
 		SDL_Texture *prevtext = SDL_CreateTextureFromSurface(renderer, prevsurf);
 		SDL_Rect prevRect = { gridx_l+cols*cellsz+(width-(gridx_l+cols*cellsz)-preview->getWidth())/2, gridy_t-2*preview->getHeight(), preview->getWidth(), preview->getHeight() };
 		SDL_RenderCopy(renderer, prevtext, NULL, &prevRect);
+		prevRect.x -= 1;
+		prevRect.y -= 1;
+		prevRect.w += 1;
+		prevRect.h += 1;
+		SDL_RenderDrawRect(renderer, &prevRect);
+		prevRect.x -= 2;
+		prevRect.y -= 2;
+		prevRect.w += 4;
+		prevRect.h += 4;
+		SDL_RenderDrawRect(renderer, &prevRect);
 		SDL_DestroyTexture(prevtext);
 	}
 	SDL_RenderPresent(renderer);
@@ -316,4 +324,15 @@ void Frame::mouseAction(SDL_Event *e)
 		}
 	}
 	
+}
+
+
+
+void Frame::clearAllCells()
+{
+	for(int r=0; r<grid->getHeight(); ++r){
+		Row row = grid->getRow(r);
+		for(auto& c: row)
+			c->setState(State::Clear);
+	}
 }

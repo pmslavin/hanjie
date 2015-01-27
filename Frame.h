@@ -21,15 +21,15 @@ public:
 	void setGridGeometry();
 	void setCell(int x, int y);
 	void clearCell(int x, int y);
-	void clickAt(int mx, int my);
 	void refresh();
 	void writeBMP(const char *filename);
 	void mouseAction(SDL_Event *e);
+	void clearAllCells();
 protected:
 	int width, height;
 	int rows, cols;
-	int code_l, code_t;
-	int gridx_l, gridy_t;
+	int code_l, code_t;	/* Code space x (l)eft, y (t)op */
+	int gridx_l, gridy_t;	/* Grid start x (l)eft, y (t)op */
 	int cellsz;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
@@ -42,6 +42,7 @@ protected:
 	Preview *preview;
 	bool mouseDown;
 	int lastc_x, lastc_y;
+	void clickAt(int mx, int my);
 };
 
 #endif

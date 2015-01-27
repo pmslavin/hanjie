@@ -10,6 +10,8 @@ Preview::Preview(int w, int h, Grid *g) :	width(w),
 						pxsz_x(width/grid->getWidth()),
 						pxsz_y(height/grid->getHeight())
 {
+	width = pxsz_x * grid->getWidth();
+	height = pxsz_y * grid->getHeight();
 	surf = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
 }
 

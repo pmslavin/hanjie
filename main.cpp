@@ -28,16 +28,16 @@ whale = { 	"00111011000000000000",
 		"01100100100000000000",
 		"01000100000000000000",
 		"00000100000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000",
-		"00000000000000000000"
+		"00111111100001110111",
+		"01111111110011111110",
+		"01111111111010001100",
+		"11111111111100100110",
+		"11111110011110000011",
+		"11111111011111100111",
+		"01010111111111111110",
+		"01010101111001111110",
+		"01110101011100111000",
+		"00011111111111110010"
 	};
 
 std::vector<std::string>
@@ -82,18 +82,13 @@ int main()
 	const int delay = 100;
 	SDL_Event event;
 
-	Grid pg(puppy);
+	Grid pg(whale);
 //	Grid pg(20, 15);
 	Frame f(1200, 900, &pg);
 
 	std::cout << pg.getWidth() << ","
 		  << pg.getHeight() << std::endl;
 	
-/*	for(int r=0; r<pg.getHeight(); ++r){
-		for(auto& e: pg.getRow(r))
-			std::cout << *e;
-	}
-*/
 	for(int r=0; r<pg.getHeight(); ++r){
 		std::cout << pg.writeRow(r) << std::endl;
 	}
@@ -107,8 +102,8 @@ int main()
 		std::cout << std::endl;
 	}
 
-	code.clear();
 	std::cout << std::endl;
+	code.clear();
 
 	for(int c=0; c<pg.getWidth(); ++c){
 		code = pg.encode(pg.getColumn(c));
@@ -118,8 +113,6 @@ int main()
 		std::cout << std::endl;
 	}
 
-	f.drawGrid();
-	f.updateGrid();
 	f.refresh();
 	while(active){
 		while(SDL_PollEvent(&event)){
@@ -132,6 +125,8 @@ int main()
 							active = false;
 						if(event.key.keysym.sym == 'b')
 							f.writeBMP("output.bmp");
+						if(event.key.keysym.sym == 'r')
+							f.clearAllCells();
 						break;
 				case SDL_MOUSEBUTTONDOWN:
 				case SDL_MOUSEBUTTONUP:
