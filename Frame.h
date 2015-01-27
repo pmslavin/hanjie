@@ -23,9 +23,12 @@ public:
 	void clearCell(int x, int y);
 	void clickAt(int mx, int my);
 	void refresh();
+	void writeBMP(const char *filename);
+	void mouseAction(SDL_Event *e);
 protected:
 	int width, height;
 	int rows, cols;
+	int code_l, code_t;
 	int gridx_l, gridy_t;
 	int cellsz;
 	SDL_Window *window;
@@ -35,8 +38,10 @@ protected:
 	void flipCell(int x, int y);
 	Cell& xy2Cell(int mx, int my);
 	bool isXYinGrid(int mx, int my) const;
-	bool hasPreview;
+	bool hasPreview, hideCells;
 	Preview *preview;
+	bool mouseDown;
+	int lastc_x, lastc_y;
 };
 
 #endif

@@ -82,7 +82,7 @@ int main()
 	const int delay = 100;
 	SDL_Event event;
 
-	Grid pg(cross);
+	Grid pg(puppy);
 //	Grid pg(20, 15);
 	Frame f(1200, 900, &pg);
 
@@ -118,7 +118,6 @@ int main()
 		std::cout << std::endl;
 	}
 
-	int mx, my;
 	f.drawGrid();
 	f.updateGrid();
 	f.refresh();
@@ -131,10 +130,13 @@ int main()
 				case SDL_KEYDOWN:
 						if(event.key.keysym.sym == 'q')
 							active = false;
+						if(event.key.keysym.sym == 'b')
+							f.writeBMP("output.bmp");
 						break;
 				case SDL_MOUSEBUTTONDOWN:
-						SDL_GetMouseState(&mx, &my);
-						f.clickAt(mx, my);
+				case SDL_MOUSEBUTTONUP:
+				case SDL_MOUSEMOTION:
+						f.mouseAction(&event);
 						break;
 
 			}	

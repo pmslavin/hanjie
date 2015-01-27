@@ -8,10 +8,14 @@
 
 Frame::Frame(int w, int h, Grid *g, bool prev) :	width(w), height(h),
 							rows(15), cols(20),
+							code_l(width/7), code_t(height/7),
 							cellsz(32),
 							grid(g),
 							hasPreview(prev),
-							preview(nullptr)
+							hideCells(false),
+							preview(nullptr),
+							mouseDown(false),
+							lastc_x(-1), lastc_y(-1)
 {
 	if(grid)
 		setGridGeometry();
@@ -50,8 +54,8 @@ void Frame::drawGrid()
 //	int footer	= height/7;
 	int margin_l	= width/11;
 //	int margin_r	= width/9;
-	int code_l	= width/7;		/* Code space left */
-	int code_t	= height/7;		/* Code space top */
+//	int code_l	= width/7;		/* Code space left */
+//	int code_t	= height/7;		/* Code space top */
 
 	int gridw	= cellsz * cols;
 	int gridh	= cellsz * rows;
@@ -169,7 +173,7 @@ void Frame::updateGrid()
 	for(int r=0; r<grid->getHeight(); ++r){
 		Row row = grid->getRow(r);
 		for(auto &c: row){
-			if(c->getState() == State::Filled)
+			if(c->getState() == State::Filled && !hideCells)
 				setCell(cidx, r);
 
 			++cidx;		/* "Cell index" */
@@ -259,9 +263,57 @@ void Frame::refresh()
 	if(hasPreview){
 		SDL_Surface *prevsurf = preview->draw();
 		SDL_Texture *prevtext = SDL_CreateTextureFromSurface(renderer, prevsurf);
-		SDL_Rect prevRect = { width-140, gridy_t-2*preview->getHeight(), preview->getWidth(), preview->getHeight() };
+		SDL_Rect prevRect = { gridx_l+cols*cellsz+(width-(gridx_l+cols*cellsz)-preview->getWidth())/2, gridy_t-2*preview->getHeight(), preview->getWidth(), preview->getHeight() };
 		SDL_RenderCopy(renderer, prevtext, NULL, &prevRect);
 		SDL_DestroyTexture(prevtext);
 	}
 	SDL_RenderPresent(renderer);
+}
+
+
+void Frame::writeBMP(const char *filename)
+{
+	hideCells = true;
+	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_RenderClear(renderer);
+	drawGrid();
+	updateGrid();
+
+	SDL_Rect gridRect = {gridx_l-code_l, gridy_t-code_t, code_l+cols*cellsz+2, code_t+rows*cellsz+2};
+	SDL_Surface *bmpSurf = SDL_CreateRGBSurface(0, gridRect.w, gridRect.h, 24, 0x00, 0x00, 0x00, 0x00);
+	SDL_RenderReadPixels(renderer, &gridRect, SDL_PIXELFORMAT_RGB24, bmpSurf->pixels, bmpSurf->pitch);
+	SDL_SaveBMP(bmpSurf, filename);
+	SDL_FreeSurface(bmpSurf);
+
+	hideCells = false;
+	updateGrid();
+}
+
+
+void Frame::mouseAction(SDL_Event *e)
+{
+	int mx, my;
+
+	SDL_GetMouseState(&mx, &my);
+
+	if(e->type == SDL_MOUSEBUTTONDOWN)
+		mouseDown = true;
+
+	if(e->type == SDL_MOUSEBUTTONUP){
+		mouseDown = false;
+		lastc_x = lastc_y = -1;
+	}
+
+	if(mouseDown){
+		if(isXYinGrid(mx, my)){
+			Cell& c = xy2Cell(mx, my);
+			/* Either (is different cell) or (is new click) */
+			if((c.getX() != lastc_x || c.getY() != lastc_y) || lastc_x == -1){
+				lastc_x = c.getX();
+				lastc_y = c.getY();
+				clickAt(mx, my);
+			}
+		}
+	}
+	
 }
