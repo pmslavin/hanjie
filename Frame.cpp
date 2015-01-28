@@ -9,6 +9,7 @@
 Frame::Frame(int w, int h, Grid *g, bool prev) :	width(w), height(h),
 							rows(15), cols(20),
 							code_l(width/7), code_t(height/7),
+							margin_l(width/11), margin_t(height/7),
 							cellsz(28),
 							grid(g),
 							hasPreview(prev),
@@ -28,7 +29,10 @@ Frame::Frame(int w, int h, Grid *g, bool prev) :	width(w), height(h),
 	SDL_RenderClear(renderer);
 
 	TTF_Init();
-	font = TTF_OpenFont("OpenSans-Regular.ttf", 12);
+	fontTitle = TTF_OpenFont("OpenSans-Regular.ttf", 36);
+	font12 = TTF_OpenFont("OpenSans-Regular.ttf", 12);
+	font8 = TTF_OpenFont("OpenSans-Regular.ttf", 8);
+	font = font12;
 	if(hasPreview)
 		preview = new Preview(cols*cellsz/4, rows*cellsz/4, grid);
 }
@@ -43,7 +47,9 @@ void Frame::setGridGeometry()
 
 Frame::~Frame()
 {
-	TTF_CloseFont(font);
+	TTF_CloseFont(fontTitle);
+	TTF_CloseFont(font12);
+	TTF_CloseFont(font8);
 	TTF_Quit();
 
 	if(preview)
@@ -60,7 +66,7 @@ void Frame::drawGrid()
 
 	int header	= height/6;
 //	int footer	= height/7;
-	int margin_l	= width/11;
+//	int margin_l	= width/11;
 //	int margin_r	= width/9;
 
 	int gridw	= cellsz * cols;
@@ -98,6 +104,12 @@ void Frame::drawGrid()
 
 	for(c=0; c<=cols; c+=5)
 		SDL_RenderDrawLine(renderer, gridx_l+c*cellsz+1, gridy_t-code_t, gridx_l+c*cellsz+1, gridy_t+gridh);
+
+	if(rows%5)
+		SDL_RenderDrawLine(renderer, gridx_l-code_l, gridy_t+rows*cellsz+1, gridx_l+gridw, gridy_t+rows*cellsz+1);
+
+	if(cols%5)
+		SDL_RenderDrawLine(renderer, gridx_l+cols*cellsz+1, gridy_t-code_t, gridx_l+cols*cellsz+1, gridy_t+gridh);
 
 }
 
@@ -213,6 +225,9 @@ void Frame::updateGrid()
 		cidx = 0;
 	}
 
+	if(cellsz<16)
+		font = font8;
+
 	/* Encode each column and render codes. */
 	for(int c=0; c<grid->getWidth(); ++c){
 		Column col = grid->getColumn(c);
@@ -269,13 +284,19 @@ void Frame::refresh()
 {
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(renderer);
+	SDL_Texture *titleTexture = makeTitle();
+	int tw, th;
+	SDL_QueryTexture(titleTexture, nullptr, nullptr, &tw, &th);
+	SDL_Rect titleRect = {margin_l+(gridx_l-margin_l-tw)/2, margin_t+(gridy_t-margin_t-th)/2, tw, th};
+	SDL_RenderCopy(renderer, titleTexture, nullptr, &titleRect);
+	SDL_DestroyTexture(titleTexture);
 	drawGrid();
 	updateGrid();
 	if(hasPreview){
 		SDL_Surface *prevsurf = preview->draw();
 		SDL_Texture *prevtext = SDL_CreateTextureFromSurface(renderer, prevsurf);
 		SDL_Rect prevRect = { gridx_l+cols*cellsz+(width-(gridx_l+cols*cellsz)-preview->getWidth())/2, gridy_t-2*preview->getHeight(), preview->getWidth(), preview->getHeight() };
-		SDL_RenderCopy(renderer, prevtext, NULL, &prevRect);
+		SDL_RenderCopy(renderer, prevtext, nullptr, &prevRect);
 		prevRect.x -= 1;
 		prevRect.y -= 1;
 		prevRect.w += 1;
@@ -297,6 +318,14 @@ void Frame::writeBMP(const char *filename)
 	hideCells = true;
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(renderer);
+
+	SDL_Texture *titleTexture = makeTitle();
+	int tw, th;
+	SDL_QueryTexture(titleTexture, nullptr, nullptr, &tw, &th);
+	SDL_Rect titleRect = {margin_l+(gridx_l-margin_l-tw)/2, margin_t+(gridy_t-margin_t-th)/2, tw, th};
+	SDL_RenderCopy(renderer, titleTexture, nullptr, &titleRect);
+	SDL_DestroyTexture(titleTexture);
+
 	drawGrid();
 	updateGrid();
 
@@ -376,4 +405,58 @@ void Frame::revert()
 {
 	*grid = *orig;
 	refresh();
+}
+
+
+void Frame::scale()
+{
+	if(!grid)
+		return;
+
+	const int factor = 2;
+
+	Grid *newGrid = new Grid(factor*grid->getWidth(), factor*grid->getHeight());
+	newGrid->setTitle(grid->getTitle());
+	cellsz /= factor;
+	cellsz += 2;
+
+	int cidx = 0;
+	int u, v;
+	for(int r=0; r<grid->getHeight(); ++r){
+		Row row = grid->getRow(r);
+		for(auto& c: row){
+			if(c->getState() == State::Filled){
+				for(u=factor*r; u<factor*r+factor; ++u)
+					for(v=factor*cidx; v<factor*cidx+factor; ++v){
+						Cell& nc = newGrid->getCell(v, u);
+						nc.setState(State::Filled);
+					}
+			}
+			++cidx;
+		}
+		cidx = 0;
+	}
+
+	grid = newGrid;
+	delete orig;
+	orig = new Grid(*newGrid);
+	rows *= factor;
+	cols *= factor;
+	if(hasPreview){
+		delete preview;
+		preview = new Preview(cols*cellsz/4, rows*cellsz/4, grid);
+	}
+
+	refresh();
+}
+
+
+SDL_Texture *Frame::makeTitle()
+{
+	SDL_Color textcolour = { 0x00, 0x00, 0x00, 0xFF };
+	SDL_Surface *titleSurf = TTF_RenderText_Blended(fontTitle, grid->getTitle().c_str(), textcolour);
+	SDL_Texture *titleTexture = SDL_CreateTextureFromSurface(renderer, titleSurf);
+	SDL_FreeSurface(titleSurf);
+
+	return titleTexture;
 }

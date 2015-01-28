@@ -19,7 +19,7 @@ Grid::Grid(int w, int h) : width(w),
 }
 
 
-Grid::Grid(std::vector<std::string> pattern)
+Grid::Grid(const std::vector<std::string> pattern, const std::string t) : title(t)
 {
 	width = pattern[0].size();
 	height = pattern.size();
@@ -42,7 +42,7 @@ Grid::~Grid()
 }
 
 
-Cell& Grid::getCell(int x, int y)
+Cell& Grid::getCell(const int x, const int y)
 {
 	if(x < 0 || x >= width || y < 0 || y >= height){
 		std::ostringstream ess;
@@ -144,4 +144,16 @@ std::vector<int> Grid::encode(std::vector<Cell *> unit)
 		code.push_back(run);
 
 	return code;
+}
+
+
+void Grid::setTitle(const std::string t)
+{
+	title = t;
+}
+
+
+std::string Grid::getTitle() const
+{
+	return title;
 }

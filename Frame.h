@@ -29,15 +29,17 @@ public:
 	void toggleHide();
 	void invertGrid();
 	void revert();
+	void scale();
 protected:
 	int width, height;
 	int rows, cols;
 	int code_l, code_t;	/* Code space x (l)eft, y (t)op */
 	int gridx_l, gridy_t;	/* Grid start x (l)eft, y (t)op */
+	int margin_l, margin_t;
 	int cellsz;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-	TTF_Font *font;
+	TTF_Font *font, *font12, *font8, *fontTitle;
 	Grid *grid, *orig;
 	void flipCell(int x, int y);
 	Cell& xy2Cell(int mx, int my);
@@ -47,6 +49,7 @@ protected:
 	bool mouseDown;
 	int lastc_x, lastc_y;
 	void clickAt(int mx, int my);
+	SDL_Texture *makeTitle();
 };
 
 #endif

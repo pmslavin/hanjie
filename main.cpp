@@ -82,7 +82,7 @@ int main()
 	const int delay = 100;
 	SDL_Event event;
 
-	Grid pg(whale);
+	Grid pg(whale, "Whale");
 //	Grid pg(20, 15);
 	Frame f(1200, 900, &pg);
 
@@ -133,6 +133,8 @@ int main()
 							f.invertGrid();
 						if(event.key.keysym.sym == 'r')
 							f.revert();
+						if(event.key.keysym.sym == 's')
+							f.scale();
 						break;
 				case SDL_MOUSEBUTTONDOWN:
 				case SDL_MOUSEBUTTONUP:

@@ -4,6 +4,6 @@
 [4]  Preview widow when editing.			DONE
 [5]  Read in text file pattern.
 [6]  Smooth mouse click & drag.				DONE
-[7]  Reset to blank.
-[8]  Change grid size, maintani pattern.
-[9]  Emphasize first & last lines.
+[7]  Reset to blank.					DONE
+[8]  Change grid size, maintain pattern.		DONE
+[9]  Emphasize last line when not div 5.		DONE

@@ -13,18 +13,21 @@ class Grid
 {
 public:
 	Grid(int w, int h);
-	Grid(std::vector<std::string> pattern);
+	Grid(const std::vector<std::string> pattern, const std::string t="");
 	~Grid();
-	Cell& getCell(int x, int y);
+	Cell& getCell(const int x, const int y);
 	Row getRow(const int r);
 	Column getColumn(const int c);
 	int getWidth() const;
 	int getHeight() const;
 	std::string writeRow(const int r);
 	std::vector<int> encode(const std::vector<Cell *> unit);
+	void setTitle(const std::string t);
+	std::string getTitle() const;
 protected:
 	int width, height;
 	std::vector<Cell> cells;
+	std::string title;
 };
 
 
