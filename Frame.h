@@ -4,6 +4,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 
+
 class Grid;
 class Cell;
 enum class State;
@@ -27,6 +28,7 @@ public:
 	void clearAllCells();
 	void toggleHide();
 	void invertGrid();
+	void revert();
 protected:
 	int width, height;
 	int rows, cols;
@@ -36,7 +38,7 @@ protected:
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	TTF_Font *font;
-	Grid *grid;
+	Grid *grid, *orig;
 	void flipCell(int x, int y);
 	Cell& xy2Cell(int mx, int my);
 	bool isXYinGrid(int mx, int my) const;

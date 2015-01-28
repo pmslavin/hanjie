@@ -125,12 +125,14 @@ int main()
 							active = false;
 						if(event.key.keysym.sym == 'b')
 							f.writeBMP("output.bmp");
-						if(event.key.keysym.sym == 'r')
+						if(event.key.keysym.sym == 'c')
 							f.clearAllCells();
 						if(event.key.keysym.sym == 'h')
 							f.toggleHide();
 						if(event.key.keysym.sym == 'i')
 							f.invertGrid();
+						if(event.key.keysym.sym == 'r')
+							f.revert();
 						break;
 				case SDL_MOUSEBUTTONDOWN:
 				case SDL_MOUSEBUTTONUP:

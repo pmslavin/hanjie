@@ -17,8 +17,10 @@ Frame::Frame(int w, int h, Grid *g, bool prev) :	width(w), height(h),
 							mouseDown(false),
 							lastc_x(-1), lastc_y(-1)
 {
-	if(grid)
+	if(grid){
 		setGridGeometry();
+		orig = new Grid(*grid);
+	}
 
 	window = SDL_CreateWindow("Hanjie", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, 0);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -41,8 +43,14 @@ void Frame::setGridGeometry()
 
 Frame::~Frame()
 {
+	TTF_CloseFont(font);
+	TTF_Quit();
+
 	if(preview)
 		delete preview;
+
+	if(orig)
+		delete orig;
 }
 
 
@@ -155,6 +163,11 @@ void Frame::clearCell(int x, int y)
 void Frame::setGrid(Grid *g)
 {
 	grid = g;
+
+	if(orig)
+		delete orig;
+
+	orig = new Grid(*grid);
 }
 
 
@@ -162,7 +175,7 @@ void Frame::updateGrid()
 {
 	std::vector<int> code;
 	SDL_Surface *code_num;
-	SDL_Color textcolour = { 0x00, 0x00, 0x00, 0x00 };
+	SDL_Color textcolour = { 0x00, 0x00, 0x00, 0xFF };
 	SDL_Rect code_rect;
 	int cidx = 0;
 
@@ -356,4 +369,11 @@ void Frame::invertGrid()
 				c->setState(State::Filled);
 		}
 	}
+}
+
+
+void Frame::revert()
+{
+	*grid = *orig;
+	refresh();
 }
